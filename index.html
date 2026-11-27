@@ -3,605 +3,284 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AGCOMESTORE.DB</title>
+<title>AGCOMESTORE.DB — Joki & Top Up Game</title>
 <style>
   :root{
-    --radius: 14px;
-    --shadow: 0 8px 30px rgba(0,0,0,.35);
-    --bg:#0f1115;
-    --surface:#171a21;
-    --surface-2:#1e222b;
-    --border:#2a2f3a;
-    --text:#e8eaee;
-    --muted:#8b93a1;
-    --accent:#b23a3a;
-    --accent-soft:rgba(178,58,58,.15);
-    --accent-text:#ffffff;
-    --topbar-bg:rgba(15,17,21,.85);
+    --radius-sm:8px; --radius:14px; --radius-lg:20px;
+    --shadow-sm:0 1px 3px rgba(16,24,40,.08);
+    --shadow:0 8px 24px rgba(16,24,40,.10);
+    --shadow-lg:0 16px 40px rgba(16,24,40,.14);
+    --bg:#f6f8fb; --surface:#ffffff; --surface-2:#f1f4f9;
+    --border:#e4e8ef; --text:#0f172a; --muted:#64748b;
+    --primary:#1d4ed8; --primary-soft:#e8efff; --primary-text:#ffffff;
+    --cta:#ff6a00; --cta-soft:#fff1e6; --cta-text:#ffffff;
+    --success:#16a34a; --topbar-bg:rgba(255,255,255,.94);
   }
-
-  /* ================= TEMA PENUH ================= */
-  html[data-theme="red"]{
-    --bg:#140d0d; --surface:#1d1212; --surface-2:#271818;
-    --border:#3a2222; --text:#f0e6e6; --muted:#a98a8a;
-    --accent:#c04545; --accent-soft:rgba(192,69,69,.18); --accent-text:#fff;
-    --topbar-bg:rgba(20,13,13,.85);
+  html[data-theme="dark"]{
+    --bg:#0b1220; --surface:#111a2e; --surface-2:#16213a;
+    --border:#22304d; --text:#e6edf7; --muted:#93a4bf;
+    --primary:#5b8cff; --primary-soft:rgba(91,140,255,.16);
+    --cta:#ff8a3d; --cta-soft:rgba(255,138,61,.14);
+    --topbar-bg:rgba(11,18,32,.9);
+    --shadow:0 8px 24px rgba(0,0,0,.45);
+    --shadow-lg:0 16px 40px rgba(0,0,0,.55);
   }
-  html[data-theme="blue"]{
-    --bg:#0c1220; --surface:#121a2c; --surface-2:#19233a;
-    --border:#243250; --text:#e3eaf7; --muted:#8a9ab8;
-    --accent:#3a6fd0; --accent-soft:rgba(58,111,208,.18); --accent-text:#fff;
-    --topbar-bg:rgba(12,18,32,.85);
-  }
-  html[data-theme="green"]{
-    --bg:#0c1712; --surface:#122019; --surface-2:#192b22;
-    --border:#24402f; --text:#e3f3ea; --muted:#8ab89c;
-    --accent:#2f9a5e; --accent-soft:rgba(47,154,94,.18); --accent-text:#fff;
-    --topbar-bg:rgba(12,23,18,.85);
-  }
-  html[data-theme="grey"]{
-    --bg:#121417; --surface:#1a1d22; --surface-2:#23272e;
-    --border:#333842; --text:#e6e8ec; --muted:#9aa1ac;
-    --accent:#808894; --accent-soft:rgba(128,136,148,.2); --accent-text:#fff;
-    --topbar-bg:rgba(18,20,23,.85);
-  }
-  html[data-theme="purple"]{
-    --bg:#120d1c; --surface:#1a1328; --surface-2:#231a35;
-    --border:#35284f; --text:#ece4f7; --muted:#a294bd;
-    --accent:#7a55c9; --accent-soft:rgba(122,85,201,.18); --accent-text:#fff;
-    --topbar-bg:rgba(18,13,28,.85);
-  }
-  html[data-theme="white"]{
-    --bg:#eef0f3; --surface:#ffffff; --surface-2:#e6e9ee;
-    --border:#cfd4dc; --text:#1b1e24; --muted:#5f6774;
-    --accent:#3a3f4a; --accent-soft:rgba(58,63,74,.12); --accent-text:#fff;
-    --topbar-bg:rgba(255,255,255,.88);
-  }
-  html[data-theme="black"]{
-    --bg:#050607; --surface:#0b0d10; --surface-2:#121519;
-    --border:#1e2228; --text:#f0f1f4; --muted:#8a919e;
-    --accent:#d6d9df; --accent-soft:rgba(214,217,223,.12); --accent-text:#0b0d10;
-    --topbar-bg:rgba(5,6,7,.85);
-  }
-
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-    transition: background .3s ease, color .3s ease;
+    background:var(--bg);color:var(--text);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    transition:background .3s,color .3s;line-height:1.5;
   }
   a{color:inherit;text-decoration:none}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
   img{display:block;max-width:100%}
+  .container{max-width:1200px;margin:0 auto;padding:0 20px}
 
-  #loader{
-    position:fixed;inset:0;background:var(--bg);z-index:9999;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-    transition:opacity .6s ease, visibility .6s, background .3s;
-  }
-  #loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
-  .loader-ring{
-    width:52px;height:52px;border-radius:50%;
-    border:3px solid var(--border);
-    border-top-color:var(--accent);
-    animation:spin 1s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loader-text{font-size:14px;letter-spacing:.5px;color:var(--muted)}
-  .loader-text b{color:var(--text);font-weight:600}
+  /* TOPBAR */
+  .topbar{position:sticky;top:0;z-index:100;background:var(--topbar-bg);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800}
+  .brand img{width:40px;height:40px;border-radius:12px;object-fit:cover;
+    border:1px solid var(--border);background:var(--surface-2)}
+  .brand .brand-text span{font-size:16px;display:block;line-height:1.1}
+  .brand .brand-text small{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:2px}
+  .nav-links{display:flex;align-items:center;gap:6px}
+  .nav-links a{font-size:13px;font-weight:600;color:var(--muted);
+    padding:8px 12px;border-radius:10px;transition:.15s}
+  .nav-links a:hover{color:var(--primary);background:var(--primary-soft)}
+  .actions{display:flex;align-items:center;gap:10px}
+  .icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+    display:grid;place-items:center;background:var(--surface);transition:.2s;box-shadow:var(--shadow-sm)}
+  .icon-btn:hover{border-color:var(--primary);color:var(--primary)}
+  .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
 
-  .topbar{
-    position:sticky;top:0;z-index:100;
-    background:var(--topbar-bg);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--border);
-    transition:background .3s, border-color .3s;
-  }
-  .topbar-inner{
-    max-width:1180px;margin:0 auto;padding:12px 18px;
-    display:flex;align-items:center;justify-content:space-between;gap:14px;
-  }
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
-  .brand img{width:34px;height:34px;border-radius:9px;object-fit:cover;border:1px solid var(--border)}
-  .brand span{font-size:16px}
-  .brand small{display:block;font-size:10px;font-weight:500;color:var(--muted);letter-spacing:1.5px}
-
-  .actions{display:flex;align-items:center;gap:8px}
-  .icon-btn{
-    width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
-    display:grid;place-items:center;background:var(--surface);
-    transition:.2s;
-  }
-  .icon-btn:hover{background:var(--surface-2);border-color:var(--accent)}
-  .icon-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:1.8}
-
-  .theme-wrap{position:relative}
-  .theme-menu{
-    position:absolute;right:0;top:46px;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:12px;padding:8px;min-width:170px;
-    display:none;flex-direction:column;gap:4px;
-    box-shadow:var(--shadow);
-  }
-  .theme-menu.open{display:flex}
-  .theme-item{
-    display:flex;align-items:center;gap:10px;
-    padding:8px 10px;border-radius:8px;font-size:13px;color:var(--text);
-    transition:.15s;
-  }
-  .theme-item:hover{background:var(--surface-2)}
-  .swatch{width:16px;height:16px;border-radius:50%;border:1px solid var(--border)}
-  .sw-red{background:#c04545}
-  .sw-blue{background:#3a6fd0}
-  .sw-green{background:#2f9a5e}
-  .sw-grey{background:#808894}
-  .sw-purple{background:#7a55c9}
-  .sw-white{background:#f2f3f5}
-  .sw-black{background:#0b0c0f}
-
-  .search-wrap{
-    max-width:1180px;margin:18px auto 0;padding:0 18px;
-  }
-  .search-box{
-    display:flex;align-items:center;gap:10px;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:12px;padding:0 14px;height:46px;
-    transition:.2s;
-  }
-  .search-box:focus-within{border-color:var(--accent);background:var(--surface-2)}
-  .search-box svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.8;flex-shrink:0}
-  .search-box input{
-    flex:1;background:none;border:none;outline:none;color:var(--text);
-    font-size:14px;height:100%;
-  }
-  .search-box input::placeholder{color:var(--muted)}
-  #searchResult{
-    margin-top:10px;display:none;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:12px;overflow:hidden;
-  }
+  /* HERO SEARCH */
+  .hero-search{background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 55%,#3b82f6 100%);
+    color:#fff;padding:36px 0 44px;position:relative;overflow:hidden}
+  .hero-search::after{content:"";position:absolute;right:-120px;top:-120px;
+    width:360px;height:360px;border-radius:50%;background:rgba(255,255,255,.08)}
+  .hero-search::before{content:"";position:absolute;left:-80px;bottom:-140px;
+    width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06)}
+  .hero-head{position:relative;z-index:2;text-align:center;margin-bottom:22px}
+  .hero-head h1{font-size:clamp(22px,3.2vw,32px);font-weight:900;letter-spacing:-.5px;line-height:1.2}
+  .hero-head p{margin-top:8px;font-size:14px;color:rgba(255,255,255,.85);font-weight:500}
+  .search-big{position:relative;z-index:2;max-width:640px;margin:0 auto;
+    display:flex;align-items:center;gap:10px;background:#fff;
+    border-radius:999px;padding:6px 6px 6px 18px;box-shadow:0 20px 40px rgba(15,23,42,.25)}
+  .search-big svg{width:20px;height:20px;stroke:#94a3b8;fill:none;stroke-width:2;flex-shrink:0}
+  .search-big input{flex:1;border:none;outline:none;background:none;font-size:15px;color:#0f172a;height:44px}
+  .search-big input::placeholder{color:#94a3b8}
+  .search-big .search-go{background:var(--cta);color:var(--cta-text);font-weight:800;font-size:13px;
+    padding:0 20px;height:44px;border-radius:999px;transition:.2s}
+  .search-big .search-go:hover{filter:brightness(1.08)}
+  #searchResult{max-width:640px;margin:12px auto 0;position:relative;z-index:2;
+    background:var(--surface);border-radius:var(--radius);overflow:hidden;
+    display:none;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
   #searchResult.show{display:block}
-  .search-loading{
-    padding:16px;text-align:center;color:var(--muted);font-size:13px;
-    display:flex;align-items:center;justify-content:center;gap:10px;
-  }
-  .mini-spin{
-    width:16px;height:16px;border-radius:50%;
-    border:2px solid var(--border);border-top-color:var(--accent);
-    animation:spin .7s linear infinite;
-  }
-  .search-item{
-    display:flex;align-items:center;gap:12px;
-    padding:12px 14px;border-bottom:1px solid var(--border);
-    transition:.15s;cursor:pointer;
-  }
+  .search-loading{padding:18px;text-align:center;color:var(--muted);font-size:13px;
+    display:flex;align-items:center;justify-content:center;gap:10px}
+  .mini-spin{width:16px;height:16px;border-radius:50%;
+    border:2px solid var(--border);border-top-color:var(--primary);animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .search-item{display:flex;align-items:center;gap:12px;padding:12px 16px;
+    border-bottom:1px solid var(--border);cursor:pointer;transition:.15s}
   .search-item:last-child{border-bottom:none}
   .search-item:hover{background:var(--surface-2)}
-  .search-item img{width:40px;height:52px;object-fit:cover;border-radius:6px}
-  .search-item b{font-size:14px;display:block}
+  .search-item img{width:44px;height:56px;object-fit:cover;border-radius:8px}
+  .search-item b{font-size:14px;display:block;color:var(--text)}
   .search-item small{font-size:11px;color:var(--muted)}
 
-  .hero{
-    max-width:1180px;margin:22px auto 0;padding:0 18px;
-  }
-  .hero-label{
-    font-size:12px;letter-spacing:2px;color:var(--muted);
-    text-transform:uppercase;margin-bottom:10px;font-weight:600;
-  }
-  .hero-viewport{
-    position:relative;border-radius:var(--radius);overflow:hidden;
-    border:1px solid var(--border);background:var(--surface);
-    aspect-ratio:16/9;
-  }
-  .hero-track{display:flex;height:100%;transition:transform .55s cubic-bezier(.22,.9,.3,1)}
-  .hero-slide{min-width:100%;height:100%;position:relative}
-  .hero-slide img{width:100%;height:100%;object-fit:cover}
-  .hero-slide::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(to top, rgba(0,0,0,.55), transparent 55%);
-  }
-  .hero-dots{
-    position:absolute;bottom:12px;left:0;right:0;
-    display:flex;justify-content:center;gap:7px;z-index:2;
-  }
-  .hero-dot{
-    width:8px;height:8px;border-radius:50%;
-    background:rgba(255,255,255,.4);transition:.2s;
-  }
-  .hero-dot.active{background:#fff;width:22px;border-radius:5px}
-  .hero-arrow{
-    position:absolute;top:50%;transform:translateY(-50%);
-    width:36px;height:36px;border-radius:50%;
-    background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
-    display:grid;place-items:center;z-index:3;transition:.2s;
-  }
-  .hero-arrow:hover{background:rgba(0,0,0,.7)}
-  .hero-arrow svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
-  .hero-arrow.prev{left:10px}
-  .hero-arrow.next{right:10px}
+  /* PROMO */
+  .promo-section{margin-top:-26px;position:relative;z-index:5}
+  .promo-viewport{position:relative;border-radius:var(--radius-lg);overflow:hidden;
+    background:var(--surface);border:1px solid var(--border);aspect-ratio:16/6;
+    box-shadow:var(--shadow-lg)}
+  .promo-track{display:flex;height:100%;transition:transform .55s cubic-bezier(.22,.9,.3,1)}
+  .promo-slide{min-width:100%;height:100%}
+  .promo-slide img{width:100%;height:100%;object-fit:cover}
+  .promo-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:2}
+  .promo-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);transition:.2s}
+  .promo-dot.active{background:#fff;width:22px;border-radius:5px}
+  .promo-arrow{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;
+    border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;
+    z-index:3;transition:.2s;box-shadow:var(--shadow-sm)}
+  .promo-arrow:hover{background:#fff}
+  .promo-arrow svg{width:16px;height:16px;stroke:#0f172a;fill:none;stroke-width:2.5}
+  .promo-arrow.prev{left:12px}
+  .promo-arrow.next{right:12px}
 
-  .section-title{
-    max-width:1180px;margin:34px auto 0;padding:0 18px;
-    display:flex;align-items:center;gap:10px;
-  }
-  .section-title h2{
-    font-size:18px;font-weight:700;letter-spacing:.2px;
-  }
-  .section-title .bar{width:4px;height:20px;border-radius:2px;background:var(--accent)}
+  /* SECTION */
+  .section{margin-top:40px}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .section-head h2{font-size:20px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+  .section-head h2::before{content:"";width:5px;height:22px;border-radius:3px;background:var(--primary)}
+  .section-head .see-all{font-size:12px;font-weight:700;color:var(--primary);
+    padding:6px 12px;border-radius:999px;background:var(--primary-soft)}
 
-  .game-section{
-    max-width:1180px;margin:16px auto 0;padding:0 18px;
-  }
-  .poster-stage{
-    position:relative;
-    perspective:1400px;
-    height:440px;
-    overflow:hidden;
-    border-radius:var(--radius);
-  }
-  .poster-3d{
-    position:absolute;top:50%;left:50%;
-    width:230px;height:408px;
-    margin-left:-115px;margin-top:-204px;
-    transform-style:preserve-3d;
-    transition:transform .6s cubic-bezier(.22,.9,.3,1);
-  }
-  .poster-card{
-    position:absolute;inset:0;
-    border-radius:14px;overflow:hidden;
-    border:1px solid var(--border);
-    box-shadow:0 20px 40px rgba(0,0,0,.5);
-    transition:transform .6s cubic-bezier(.22,.9,.3,1), opacity .4s, filter .4s;
-    cursor:pointer;
-    background:var(--surface);
-  }
-  .poster-card img{width:100%;height:100%;object-fit:cover}
-  .poster-card::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(to top, rgba(0,0,0,.45), transparent 40%);
-    pointer-events:none;
-  }
-  .poster-card.center{box-shadow:0 25px 60px rgba(0,0,0,.65);border-color:var(--accent)}
-  .poster-card.side{filter:brightness(.55);opacity:.75}
-  .poster-card.far{filter:brightness(.35);opacity:.4}
+  /* GAME GRID */
+  .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+  .game-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;transition:.2s;cursor:pointer;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
+  .game-card:hover{transform:translateY(-4px);border-color:var(--primary);box-shadow:var(--shadow-lg)}
+  .game-card .thumb{aspect-ratio:3/4;background:var(--surface-2);overflow:hidden}
+  .game-card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+  .game-card:hover .thumb img{transform:scale(1.05)}
+  .game-card .meta{padding:12px 14px 14px}
+  .game-card .meta b{font-size:13px;font-weight:800;display:block;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .game-card .meta small{font-size:11px;color:var(--muted);display:block;margin-top:2px}
+  .game-card .meta .badge{display:inline-block;margin-top:8px;font-size:10px;font-weight:800;
+    color:var(--cta);background:var(--cta-soft);padding:3px 8px;border-radius:999px;letter-spacing:.3px}
 
-  .poster-arrows{
-    position:absolute;bottom:10px;left:0;right:0;
-    display:flex;justify-content:center;gap:10px;z-index:5;
-  }
-  .poster-btn{
-    width:42px;height:42px;border-radius:50%;
-    background:var(--surface);border:1px solid var(--border);
-    display:grid;place-items:center;transition:.2s;
-  }
-  .poster-btn:hover{background:var(--surface-2);border-color:var(--accent)}
-  .poster-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:2}
-  .poster-hint{
-    text-align:center;font-size:11px;color:var(--muted);
-    margin-top:10px;letter-spacing:1px;
-  }
-
-  .drawer{
-    max-height:0;overflow:hidden;
-    transition:max-height .55s cubic-bezier(.22,.9,.3,1);
-    max-width:1180px;margin:0 auto;padding:0 18px;
-  }
-  .drawer.open{max-height:1600px}
-  .drawer-inner{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);margin-top:14px;padding:18px;
-  }
-  .drawer-head{
-    display:flex;align-items:center;justify-content:space-between;
-    gap:12px;margin-bottom:14px;flex-wrap:wrap;
-  }
-  .drawer-head h3{font-size:16px}
-  .close-btn{
-    font-size:12px;color:var(--muted);border:1px solid var(--border);
-    border-radius:8px;padding:6px 12px;transition:.2s;
-  }
-  .close-btn:hover{color:var(--text);border-color:var(--accent)}
-
-  .price-list{display:flex;flex-direction:column;gap:8px}
-  .price-row{
-    display:flex;justify-content:space-between;align-items:center;gap:12px;
-    padding:12px 14px;background:var(--surface-2);
-    border:1px solid var(--border);border-radius:10px;
-    transition:.15s;
-  }
-  .price-row:hover{border-color:var(--accent)}
-  .price-row .name{font-size:13px;font-weight:600}
+  /* PANEL PAKET */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+    padding:20px;box-shadow:var(--shadow)}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .panel-head h3{font-size:17px;font-weight:900}
+  .close-btn{font-size:12px;font-weight:700;color:var(--muted);
+    border:1px solid var(--border);border-radius:8px;padding:6px 12px;transition:.2s;background:var(--surface)}
+  .close-btn:hover{color:var(--text);border-color:var(--primary)}
+  .price-list{display:flex;flex-direction:column;gap:10px}
+  .price-row{display:flex;justify-content:space-between;align-items:center;gap:14px;
+    padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:var(--radius);transition:.15s}
+  .price-row:hover{border-color:var(--primary);background:var(--surface)}
+  .price-row .name{font-size:14px;font-weight:800}
   .price-row .sub{font-size:11px;color:var(--muted);margin-top:2px}
-  .price-row .price{font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap}
-  .price-row .pick{
-    font-size:11px;padding:6px 10px;border-radius:8px;
-    background:var(--accent-soft);border:1px solid var(--accent);
-    color:var(--text);transition:.15s;flex-shrink:0;
-  }
-  .price-row .pick:hover{background:var(--accent);color:var(--accent-text)}
+  .price-row .right{display:flex;align-items:center;gap:12px}
+  .price-row .price{font-size:14px;font-weight:900;color:var(--primary);white-space:nowrap}
+  .price-row .pick{font-size:12px;font-weight:800;padding:8px 16px;border-radius:999px;
+    background:var(--cta);color:var(--cta-text);transition:.15s;flex-shrink:0}
+  .price-row .pick:hover{filter:brightness(1.08)}
+  .note{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6;
+    padding:12px 14px;background:var(--primary-soft);border-radius:10px;border-left:3px solid var(--primary)}
 
-  .note{
-    margin-top:12px;font-size:11px;color:var(--muted);line-height:1.6;
-    padding:10px 12px;background:var(--surface-2);border-radius:8px;
-    border-left:3px solid var(--accent);
-  }
+  /* CTA */
+  .cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  .cta-card{display:flex;align-items:center;gap:16px;background:var(--surface);
+    border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;transition:.2s;box-shadow:var(--shadow-sm)}
+  .cta-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .cta-icon{width:52px;height:52px;border-radius:14px;background:var(--primary-soft);
+    display:grid;place-items:center;flex-shrink:0}
+  .cta-icon svg{width:24px;height:24px;stroke:var(--primary);fill:none;stroke-width:2}
+  .cta-card b{font-size:14px;display:block}
+  .cta-card small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+  .topup-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+    padding:18px;margin-top:16px;border-radius:var(--radius-lg);
+    background:linear-gradient(135deg,#ff6a00,#ff8a3d);color:#fff;font-weight:900;font-size:15px;
+    transition:.2s;box-shadow:0 12px 24px rgba(255,106,0,.28)}
+  .topup-btn:hover{filter:brightness(1.06)}
+  .topup-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5}
+  .dl-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+    padding:15px;margin-top:12px;border-radius:var(--radius-lg);background:var(--surface);
+    border:1px solid var(--border);font-weight:800;font-size:13px;transition:.2s;color:var(--text)}
+  .dl-btn:hover{border-color:var(--primary);color:var(--primary)}
 
-  /* BARU: Tombol minta kode admin */
-  .request-code-box{
-    margin-top:14px;
-    padding:14px;
-    background:var(--surface-2);
-    border:1px dashed var(--accent);
-    border-radius:10px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    align-items:center;
-    text-align:center;
-  }
-  .request-code-box p{
-    font-size:12px;
-    color:var(--muted);
-    line-height:1.6;
-  }
-  .request-code-box p b{ color:var(--text); }
-  .request-code-btn{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    background:var(--accent);
-    color:var(--accent-text);
-    font-weight:700;
-    font-size:13px;
-    transition:.2s;
-    letter-spacing:.3px;
-  }
-  .request-code-btn:hover{ filter:brightness(1.12); }
-  .request-code-btn svg{
-    width:18px;
-    height:18px;
-    stroke:var(--accent-text);
-    fill:none;
-    stroke-width:2;
-  }
+  /* SUPPORT */
+  .support-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .support-item{background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm)}
+  .support-item .role{font-size:10px;color:var(--muted);letter-spacing:1.5px;
+    text-transform:uppercase;font-weight:800}
+  .support-item .who{font-size:13px;font-weight:800;margin-top:6px;line-height:1.4}
+  .sponsor-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  .sponsor-row img{width:100%;height:88px;object-fit:contain;background:var(--surface);
+    border:1px solid var(--border);border-radius:var(--radius);padding:10px}
+  .dev-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .dev-chip{display:flex;align-items:center;gap:8px;background:var(--surface);
+    border:1px solid var(--border);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700}
+  .dev-chip img{width:24px;height:24px;object-fit:cover;border-radius:50%}
 
-  .quick-grid{
-    max-width:1180px;margin:14px auto 0;padding:0 18px;
-    display:grid;grid-template-columns:1fr 1fr;gap:12px;
-  }
-  .quick-card{
-    display:flex;align-items:center;gap:14px;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);padding:16px;transition:.2s;
-  }
-  .quick-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-  .quick-icon{
-    width:44px;height:44px;border-radius:10px;
-    background:var(--accent-soft);display:grid;place-items:center;flex-shrink:0;
-  }
-  .quick-icon svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8}
-  .quick-card b{font-size:14px;display:block}
-  .quick-card small{font-size:11px;color:var(--muted)}
+  /* FOOTER */
+  footer{margin-top:48px;padding:28px 0 40px;border-top:1px solid var(--border);
+    font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  footer .mail{color:var(--text);font-weight:600}
 
-  .topup-wrap{max-width:1180px;margin:14px auto 0;padding:0 18px}
-  .topup-btn{
-    display:flex;align-items:center;justify-content:center;gap:10px;
-    width:100%;padding:18px;border-radius:var(--radius);
-    background:var(--accent);color:var(--accent-text);font-weight:700;font-size:15px;
-    transition:.2s;letter-spacing:.3px;
-  }
-  .topup-btn:hover{filter:brightness(1.12)}
-  .topup-btn svg{width:20px;height:20px;stroke:var(--accent-text);fill:none;stroke-width:2}
-
-  .dl-wrap{max-width:1180px;margin:12px auto 0;padding:0 18px}
-  .dl-btn{
-    display:flex;align-items:center;justify-content:center;gap:10px;
-    width:100%;padding:14px;border-radius:var(--radius);
-    background:var(--surface);border:1px solid var(--border);
-    font-weight:600;font-size:13px;transition:.2s;color:var(--text);
-  }
-  .dl-btn:hover{border-color:var(--accent);background:var(--surface-2)}
-  .dl-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:1.8}
-
-  .modal-mask{
-    position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
-    z-index:500;display:none;align-items:center;justify-content:center;padding:18px;
-  }
+  /* MODAL */
+  .modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);
+    z-index:500;display:none;align-items:center;justify-content:center;padding:18px}
   .modal-mask.open{display:flex}
-  .modal{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);max-width:480px;width:100%;
-    max-height:90vh;overflow-y:auto;box-shadow:var(--shadow);
-    animation:pop .3s ease;
-  }
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+    max-width:500px;width:100%;max-height:90vh;overflow-y:auto;
+    box-shadow:var(--shadow-lg);animation:pop .3s ease}
   @keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
-  .modal-head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:16px 18px;border-bottom:1px solid var(--border);
-    position:sticky;top:0;background:var(--surface);z-index:2;
-  }
-  .modal-head h3{font-size:15px}
-  .modal-body{padding:18px;display:flex;flex-direction:column;gap:14px}
-  .field label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-weight:600}
-  .field input{
-    width:100%;padding:11px 12px;border-radius:10px;
-    background:var(--surface-2);border:1px solid var(--border);
-    color:var(--text);font-size:14px;outline:none;transition:.2s;
-  }
-  .field input:focus{border-color:var(--accent)}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;
+    padding:18px 20px;border-bottom:1px solid var(--border);
+    position:sticky;top:0;background:var(--surface);z-index:2}
+  .modal-head h3{font-size:16px;font-weight:900}
+  .modal-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+  .field label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;font-weight:800}
+  .field input{width:100%;padding:12px 14px;border-radius:10px;background:var(--surface-2);
+    border:1px solid var(--border);color:var(--text);font-size:14px;outline:none;transition:.2s}
+  .field input:focus{border-color:var(--primary);background:var(--surface)}
   .field .hint{font-size:11px;color:var(--muted);margin-top:5px}
 
-  /* === Qty / bintang stepper (khusus ML) === */
-  .qty-row{
-    display:flex;align-items:center;gap:10px;
-  }
-  .qty-btn{
-    width:40px;height:40px;border-radius:10px;
+  .qty-row{display:flex;align-items:center;gap:10px}
+  .qty-btn{width:42px;height:42px;border-radius:10px;font-size:20px;font-weight:900;
     background:var(--surface-2);border:1px solid var(--border);
-    font-size:20px;font-weight:700;color:var(--text);
-    display:grid;place-items:center;transition:.15s;flex-shrink:0;
-  }
-  .qty-btn:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .qty-btn:disabled{opacity:.4;cursor:not-allowed}
-  .qty-row input{
-    flex:1;text-align:center;font-size:16px;font-weight:700;
-    padding:11px 8px;border-radius:10px;
-    background:var(--surface-2);border:1px solid var(--border);
-    color:var(--text);outline:none;
-  }
-  .qty-row input:focus{border-color:var(--accent)}
-  .total-box{
-    background:var(--accent-soft);border:1px solid var(--accent);
-    border-radius:10px;padding:12px 14px;
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:13px;
-  }
-  .total-box b{font-size:16px;color:var(--accent)}
-  .unit-price{font-size:11px;color:var(--muted);margin-top:3px}
+    display:grid;place-items:center;transition:.15s;flex-shrink:0}
+  .qty-btn:hover{border-color:var(--primary);color:var(--primary)}
+  .qty-row input{flex:1;text-align:center;font-size:16px;font-weight:900;
+    padding:12px;border-radius:10px;background:var(--surface-2);
+    border:1px solid var(--border);color:var(--text);outline:none}
+  .total-box{background:var(--primary-soft);border:1px solid var(--primary);
+    border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;
+    align-items:center;font-size:13px;font-weight:700}
+  .total-box b{font-size:18px;color:var(--primary);font-weight:900}
+  .unit-price{font-size:11px;color:var(--muted);margin-top:4px}
 
-  .btn-primary{
-    width:100%;padding:13px;border-radius:10px;
-    background:var(--accent);color:var(--accent-text);font-weight:700;font-size:14px;
-    transition:.2s;
-  }
-  .btn-primary:hover{filter:brightness(1.1)}
-  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
-  .pay-result{display:none;flex-direction:column;gap:12px}
-  .pay-result.show{display:flex}
+  /* PAYMENT (langsung tampil) */
   .pay-box{
     background:var(--surface-2);border:1px solid var(--border);
-    border-radius:10px;padding:14px;text-align:center;
+    border-radius:var(--radius);padding:18px;text-align:center;
   }
-  .pay-box b{display:block;font-size:13px;margin-bottom:4px}
-  .pay-box .num{font-size:18px;font-weight:700;letter-spacing:1px;color:var(--accent);margin:6px 0}
-  .pay-box img{max-width:220px;margin:8px auto 0;border-radius:8px}
-  .copy-btn{
-    font-size:11px;padding:6px 12px;border-radius:8px;
-    border:1px solid var(--border);background:var(--surface);
-    transition:.15s;color:var(--text);
-  }
-  .copy-btn:hover{border-color:var(--accent)}
-  .wa-btn{
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    padding:13px;border-radius:10px;background:#1f8a4c;color:#fff;
-    font-weight:700;font-size:14px;transition:.2s;
-  }
-  .wa-btn:hover{filter:brightness(1.1)}
+  .pay-box b{display:block;font-size:14px;margin-bottom:6px;font-weight:900}
+  .pay-box img{max-width:260px;margin:10px auto 0;border-radius:10px;border:1px solid var(--border);background:#fff}
+  .pay-hint{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
 
-  .support{
-    max-width:1180px;margin:40px auto 0;padding:0 18px;
-  }
-  .support-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;
-    margin-top:14px;
-  }
-  .support-item{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:10px;padding:12px 14px;
-  }
-  .support-item .role{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:600}
-  .support-item .who{font-size:13px;font-weight:600;margin-top:4px}
-  .sponsor-row{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;
-  }
-  .sponsor-row img{
-    width:100%;height:80px;object-fit:contain;background:var(--surface);
-    border:1px solid var(--border);border-radius:10px;padding:8px;
-  }
-  .dev-row{
-    display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;
-  }
-  .dev-chip{
-    display:flex;align-items:center;gap:8px;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:10px;padding:8px 12px;font-size:12px;
-  }
-  .dev-chip img{width:24px;height:24px;object-fit:cover;border-radius:6px}
+  .wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:15px;border-radius:10px;background:var(--success);color:#fff;
+    font-weight:900;font-size:14px;transition:.2s;width:100%}
+  .wa-btn:hover{filter:brightness(1.08)}
+  .wa-btn.disabled{opacity:.5;pointer-events:none}
 
-  footer{
-    max-width:1180px;margin:30px auto 0;padding:22px 18px 40px;
-    border-top:1px solid var(--border);
-    display:flex;flex-direction:column;gap:8px;
-    font-size:12px;color:var(--muted);
-  }
-  footer .mail{color:var(--text)}
-
-  @media(max-width:640px){
-    .poster-stage{height:380px}
-    .poster-3d{width:190px;height:338px;margin-left:-95px;margin-top:-169px}
-    .quick-grid{grid-template-columns:1fr}
-    .brand span{font-size:14px}
-    .section-title h2{font-size:16px}
-    .sponsor-row{grid-template-columns:repeat(3,1fr)}
-    .sponsor-row img{height:60px}
-  }
-
-  /* ================= JAM OPERASIONAL ================= */
-  #closedOverlay{
-    position:fixed;inset:0;z-index:99999;
-    background:var(--bg);
-    display:none;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-    text-align:center;
-    padding:24px;
-    transition:opacity .4s ease;
-  }
+  /* JAM OPERASIONAL */
+  #closedOverlay{position:fixed;inset:0;z-index:99999;background:var(--bg);
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;text-align:center;padding:24px}
   #closedOverlay.show{display:flex}
-  #closedOverlay .closed-icon{
-    width:80px;height:80px;border-radius:50%;
-    background:var(--accent-soft);
-    border:2px solid var(--accent);
-    display:grid;place-items:center;
-  }
-  #closedOverlay .closed-icon svg{
-    width:38px;height:38px;stroke:var(--accent);fill:none;stroke-width:2;
-  }
-  #closedOverlay h1{
-    font-size:22px;font-weight:700;letter-spacing:.5px;
-  }
-  #closedOverlay p{
-    font-size:14px;color:var(--muted);max-width:420px;line-height:1.7;
-  }
-  #closedOverlay .closed-time{
-    font-size:28px;font-weight:800;color:var(--accent);letter-spacing:1px;
-  }
-  #closedOverlay .closed-countdown{
-    font-size:12px;color:var(--muted);letter-spacing:1px;
-  }
-  #closedOverlay .closed-hours{
-    margin-top:6px;font-size:12px;color:var(--muted);
-    border:1px solid var(--border);border-radius:10px;
-    padding:10px 16px;background:var(--surface);
-  }
-
-  #breakBanner{
-    display:none;
-    position:sticky;top:0;z-index:200;
-    background:var(--accent);
-    color:var(--accent-text);
-    text-align:center;
-    font-size:12px;
-    font-weight:600;
-    padding:8px 14px;
-    letter-spacing:.3px;
-  }
+  #closedOverlay .closed-icon{width:84px;height:84px;border-radius:50%;
+    background:var(--primary-soft);border:2px solid var(--primary);display:grid;place-items:center}
+  #closedOverlay .closed-icon svg{width:40px;height:40px;stroke:var(--primary);fill:none;stroke-width:2}
+  #closedOverlay h1{font-size:24px;font-weight:900}
+  #closedOverlay p{font-size:14px;color:var(--muted);max-width:420px;line-height:1.7}
+  #closedOverlay .closed-time{font-size:30px;font-weight:900;color:var(--primary);letter-spacing:1px}
+  #closedOverlay .closed-countdown{font-size:12px;color:var(--muted);letter-spacing:1px}
+  #closedOverlay .closed-hours{margin-top:6px;font-size:12px;color:var(--muted);
+    border:1px solid var(--border);border-radius:12px;padding:12px 18px;background:var(--surface)}
+  #breakBanner{display:none;position:sticky;top:0;z-index:200;background:var(--cta);
+    color:var(--cta-text);text-align:center;font-size:12px;font-weight:800;padding:8px 14px}
   #breakBanner.show{display:block}
+
+  @media(max-width:860px){.nav-links{display:none}.cta-grid{grid-template-columns:1fr}}
+  @media(max-width:640px){
+    .topbar-inner{height:60px}
+    .brand .brand-text span{font-size:14px}
+    .hero-search{padding:28px 0 36px}
+    .promo-viewport{aspect-ratio:16/9}
+    .game-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+    .section-head h2{font-size:18px}
+    .sponsor-row img{height:64px}
+    .price-row{flex-wrap:wrap}
+    .price-row .right{width:100%;justify-content:space-between}
+  }
 </style>
 </head>
 <body>
 
-<!-- ================= OVERLAY TUTUP ================= -->
 <div id="closedOverlay">
   <div class="closed-icon">
     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
@@ -613,145 +292,115 @@
   <div class="closed-hours">Jam Operasional: 06.00 – 00.00 WIB<br/>Istirahat: 13.00 – 13.59 WIB</div>
 </div>
 
-<!-- Banner istirahat -->
 <div id="breakBanner">⏸ Sedang istirahat (13.00 – 13.59 WIB). Kami kembali jam 14.00 WIB.</div>
 
-<div id="loader">
-  <div class="loader-ring"></div>
-  <div class="loader-text">Bergabung ke server <b>.agcomestore</b></div>
-</div>
-
 <header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <img src="ag.jpg" alt="AG" onerror="this.style.background='#b23a3a'"/>
-      <div>
+  <div class="container topbar-inner">
+    <a class="brand" href="#">
+      <img src="ag.jpg" alt="AG" onerror="this.style.background='#1d4ed8'"/>
+      <div class="brand-text">
         <span>AGCOMESTORE.DB</span>
         <small>JOKI • TOP UP</small>
       </div>
-    </div>
+    </a>
+    <nav class="nav-links">
+      <a href="#joki">Joki Game</a>
+      <a href="#layanan">Layanan</a>
+      <a href="#support">Support</a>
+    </nav>
     <div class="actions">
-      <div class="theme-wrap">
-        <button class="icon-btn" id="themeBtn" title="Ganti Tema">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>
-        </button>
-        <div class="theme-menu" id="themeMenu">
-          <button class="theme-item" data-theme="red"><span class="swatch sw-red"></span>Red</button>
-          <button class="theme-item" data-theme="blue"><span class="swatch sw-blue"></span>Blue</button>
-          <button class="theme-item" data-theme="green"><span class="swatch sw-green"></span>Green</button>
-          <button class="theme-item" data-theme="grey"><span class="swatch sw-grey"></span>Grey</button>
-          <button class="theme-item" data-theme="purple"><span class="swatch sw-purple"></span>Purple</button>
-          <button class="theme-item" data-theme="white"><span class="swatch sw-white"></span>White</button>
-          <button class="theme-item" data-theme="black"><span class="swatch sw-black"></span>Black</button>
-        </div>
-      </div>
+      <button class="icon-btn" id="themeBtn" title="Ganti Tema">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>
+      </button>
     </div>
   </div>
 </header>
 
-<section class="hero">
-  <div class="hero-label">Tersedia</div>
-  <div class="hero-viewport">
-    <div class="hero-track" id="heroTrack">
-      <div class="hero-slide"><img src="Sponsor1.jpg" alt="Promo 1" onerror="this.style.background='#1e222b'"/></div>
-      <div class="hero-slide"><img src="Sponsor2.jpg" alt="Promo 2" onerror="this.style.background='#1e222b'"/></div>
-      <div class="hero-slide"><img src="Sponsor3.jpg" alt="Promo 3" onerror="this.style.background='#1e222b'"/></div>
+<section class="hero-search">
+  <div class="container">
+    <div class="hero-head">
+      <h1>Joki & Top Up Game Favoritmu</h1>
+      <p>Proses cepat, harga transparan, admin siap bantu 24 jam.</p>
     </div>
-    <button class="hero-arrow prev" id="heroPrev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <button class="hero-arrow next" id="heroNext"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-    <div class="hero-dots" id="heroDots"></div>
+    <div class="search-big">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Cari game, contoh: Mobile Legend..." autocomplete="off"/>
+      <button class="search-go" id="searchGo">Cari</button>
+    </div>
+    <div id="searchResult"></div>
   </div>
 </section>
 
-<div class="search-wrap">
-  <div class="search-box">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-    <input type="text" id="searchInput" placeholder="Cari game untuk di-joki..." autocomplete="off"/>
-  </div>
-  <div id="searchResult"></div>
-</div>
-
-<div class="section-title">
-  <span class="bar"></span>
-  <h2>Joki Game</h2>
-</div>
-<section class="game-section">
-  <div class="poster-stage">
-    <div class="poster-3d" id="poster3d"></div>
-    <div class="poster-arrows">
-      <button class="poster-btn" id="posterPrev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button class="poster-btn" id="posterNext"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+<section class="container promo-section">
+  <div class="promo-viewport">
+    <div class="promo-track" id="heroTrack">
+      <div class="promo-slide"><img src="Sponsor1.jpg" alt="Promo 1" onerror="this.style.background='#e4e8ef'"/></div>
+      <div class="promo-slide"><img src="Sponsor2.jpg" alt="Promo 2" onerror="this.style.background='#e4e8ef'"/></div>
+      <div class="promo-slide"><img src="Sponsor3.jpg" alt="Promo 3" onerror="this.style.background='#e4e8ef'"/></div>
     </div>
+    <button class="promo-arrow prev" id="heroPrev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button class="promo-arrow next" id="heroNext"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    <div class="promo-dots" id="heroDots"></div>
   </div>
-  <div class="poster-hint">GESER UNTUK MEMILIH GAME</div>
 </section>
 
-<div class="drawer" id="gameDrawer">
-  <div class="drawer-inner">
-    <div class="drawer-head">
+<section class="container section" id="joki">
+  <div class="section-head">
+    <h2>Joki Game</h2>
+    <a class="see-all" href="#joki">Lihat Semua</a>
+  </div>
+  <div class="game-grid" id="gameGrid"></div>
+</section>
+
+<section class="container section" id="pricePanelWrap" style="display:none">
+  <div class="panel">
+    <div class="panel-head">
       <h3 id="drawerTitle">Pilih Paket</h3>
       <button class="close-btn" id="drawerClose">Tutup</button>
     </div>
     <div class="price-list" id="priceList"></div>
     <div class="note" id="drawerNote"></div>
-
-    <div class="request-code-box">
-      <p>
-        Kode akses <b>wajib</b> diminta ke admin sebelum melakukan pembayaran.<br/>
-        Klik tombol di bawah untuk meminta kode via WhatsApp.
-      </p>
-      <a class="request-code-btn" id="requestCodeBtn" href="#" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-        Minta Kode ke Admin
-      </a>
-    </div>
   </div>
-</div>
+</section>
 
-<div class="section-title">
-  <span class="bar"></span>
-  <h2>Joki Pekerjaan & Top Up</h2>
-</div>
-<div class="quick-grid">
-  <a class="quick-card" href="https://agcomstore.github.io/business.com" target="_blank" rel="noopener">
-    <div class="quick-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 7h18v13H3z"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-    </div>
-    <div>
-      <b>Joki Pekerjaan</b>
-      <small>Terima joki pekerjaan pribadi</small>
-    </div>
-  </a>
-  <a class="quick-card" href="https://agcomstore.github.io/topup.com" target="_blank" rel="noopener">
-    <div class="quick-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
-    </div>
-    <div>
-      <b>Top Up</b>
-      <small>Isi diamond, UC, & lainnya</small>
-    </div>
-  </a>
-</div>
-
-<div class="topup-wrap">
+<section class="container section" id="layanan">
+  <div class="section-head">
+    <h2>Joki Pekerjaan & Top Up</h2>
+  </div>
+  <div class="cta-grid">
+    <a class="cta-card" href="https://agcomstore.github.io/business.com" target="_blank" rel="noopener">
+      <div class="cta-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 7h18v13H3z"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+      </div>
+      <div>
+        <b>Joki Pekerjaan</b>
+        <small>Terima joki pekerjaan pribadi</small>
+      </div>
+    </a>
+    <a class="cta-card" href="https://agcomstore.github.io/topup.com" target="_blank" rel="noopener">
+      <div class="cta-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+      </div>
+      <div>
+        <b>Top Up</b>
+        <small>Isi diamond, UC, & lainnya</small>
+      </div>
+    </a>
+  </div>
   <a class="topup-btn" href="https://agcomstore.github.io/topup.com" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
     Menuju Top Up
   </a>
-</div>
-
-<div class="dl-wrap">
   <a class="dl-btn" href="topup.apk" download>
-    <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
     Download Aplikasi Top Up (.apk)
   </a>
-</div>
+</section>
 
-<div class="section-title">
-  <span class="bar"></span>
-  <h2>Support</h2>
-</div>
-<section class="support">
+<section class="container section" id="support">
+  <div class="section-head">
+    <h2>Support</h2>
+  </div>
   <div class="support-grid">
     <div class="support-item"><div class="role">Owner</div><div class="who">MOCHAMMAD ALDI DWI FIRANSYAH</div></div>
     <div class="support-item"><div class="role">Manager</div><div class="who">Muhammad Rafi Ar Rachman</div></div>
@@ -759,18 +408,18 @@
     <div class="support-item"><div class="role">Co Owner</div><div class="who">REVAN ANDHIKA RAHMAN</div></div>
   </div>
   <div class="sponsor-row">
-    <img src="Sponsor1.jpg" alt="Sponsor 1" onerror="this.style.background='#1e222b'"/>
-    <img src="Sponsor2.jpg" alt="Sponsor 2" onerror="this.style.background='#1e222b'"/>
-    <img src="Sponsor3.jpg" alt="Sponsor 3" onerror="this.style.background='#1e222b'"/>
+    <img src="Sponsor1.jpg" alt="Sponsor 1" onerror="this.style.background='#e4e8ef'"/>
+    <img src="Sponsor2.jpg" alt="Sponsor 2" onerror="this.style.background='#e4e8ef'"/>
+    <img src="Sponsor3.jpg" alt="Sponsor 3" onerror="this.style.background='#e4e8ef'"/>
   </div>
   <div class="dev-row">
-    <div class="dev-chip"><img src="Deepseek.jpg" alt="DeepSeek" onerror="this.style.background='#1e222b'"/>DeepSeek</div>
-    <div class="dev-chip"><img src="Github.jpg" alt="GitHub" onerror="this.style.background='#1e222b'"/>GitHub</div>
-    <div class="dev-chip"><img src="ag.jpg" alt="AG" onerror="this.style.background='#1e222b'"/>AG</div>
+    <div class="dev-chip"><img src="Deepseek.jpg" alt="DeepSeek" onerror="this.style.background='#e4e8ef'"/>DeepSeek</div>
+    <div class="dev-chip"><img src="Github.jpg" alt="GitHub" onerror="this.style.background='#e4e8ef'"/>GitHub</div>
+    <div class="dev-chip"><img src="ag.jpg" alt="AG" onerror="this.style.background='#e4e8ef'"/>AG</div>
   </div>
 </section>
 
-<footer>
+<footer class="container">
   <div class="mail">@afiransyah63@gmail.com</div>
   <div class="mail">@sosialmedia2009@gmail.com</div>
   <div>CopyRight @agcom2026</div>
@@ -808,32 +457,28 @@
         <b id="totalPrice">Rp0</b>
       </div>
 
-      <div class="field">
-        <label>Kode Akses dari Admin</label>
-        <input type="text" id="accessCode" autocomplete="off"/>
+      <!-- PEMBAYARAN LANGSUNG TAMPIL -->
+      <div class="pay-box">
+        <b>Pembayaran (Scan QR)</b>
+        <img src="scanqr.jpg" alt="Scan QR Pembayaran" onerror="this.style.display='none'"/>
+        <div class="pay-hint">Silakan scan QR di atas, lalu kirim bukti transfer ke admin via WhatsApp.</div>
       </div>
-      <button class="btn-primary" id="verifyBtn">Verifikasi Kode</button>
-      <div class="pay-result" id="payResult">
-        <div id="payInfo"></div>
-        <a class="wa-btn" id="waBtn" href="#" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M20.5 3.5A11 11 0 003.6 17.3L2 22l4.8-1.6A11 11 0 1020.5 3.5zM12 20a8 8 0 01-4.1-1.1l-.3-.2-2.9 1 1-2.8-.2-.3A8 8 0 1112 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 01-1.9-1.2 7 7 0 01-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.5.3-.5v-.5c0-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 2.9 2.9 0 00-.9 2.2 5 5 0 001.1 2.7 11.5 11.5 0 004.4 3.8c.6.3 1.1.4 1.5.5a3.5 3.5 0 001.6.1 2.6 2.6 0 001.7-1.2 2.1 2.1 0 00.1-1.2c0-.1-.2-.2-.4-.3z"/></svg>
-          Kirim Struk ke Admin via WhatsApp
-        </a>
-      </div>
+
+      <button class="wa-btn disabled" id="waBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M20.5 3.5A11 11 0 003.6 17.3L2 22l4.8-1.6A11 11 0 1020.5 3.5zM12 20a8 8 0 01-4.1-1.1l-.3-.2-2.9 1 1-2.8-.2-.3A8 8 0 1112 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 01-1.9-1.2 7 7 0 01-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.5.3-.5v-.5c0-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 2.9 2.9 0 00-.9 2.2 5 5 0 001.1 2.7 11.5 11.5 0 004.4 3.8c.6.3 1.1.4 1.5.5a3.5 3.5 0 001.6.1 2.6 2.6 0 001.7-1.2 2.1 2.1 0 00.1-1.2c0-.1-.2-.2-.4-.3z"/></svg>
+        Kirim Struk ke Admin via WhatsApp
+      </button>
     </div>
   </div>
 </div>
 
-<audio id="bgAudio" loop></audio>
-
 <script>
 /* =========================================================
-   DATA GAME + PEMBAYARAN
+   DATA GAME — TANPA PAYMENT & TANPA KODE
 ========================================================= */
 const GAMES = [
   {
-    key:'pubgm', name:'PUBG Mobile', poster:'pubgm.jpg',
-    wa:'6285731569186',
+    key:'pubgm', name:'PUBG Mobile', poster:'pubgm.jpg', wa:'6285731569186',
     note:'Paket Road Rank & per-tier. Tidak menerima Ultimate Royale / MetroRoyal.',
     prices:[
       {name:'Bronze → Silver', sub:'1 hari', price:'Rp12.000'},
@@ -850,16 +495,10 @@ const GAMES = [
       {name:'Road Rank: Platinum → Conqueror', sub:'4 hari', price:'Rp348.000'},
       {name:'Road Rank: Bronze → Conqueror', sub:'9 hari', price:'Rp400.000'},
       {name:'Road Rank: Crown → Conqueror', sub:'8 hari', price:'Rp269.000'}
-    ],
-    payment:[
-      {type:'account', label:'SeaBank', value:'901908107090'},
-      {type:'account', label:'ShopeePay', value:'085731569186'},
-      {type:'image', label:'DANA (Scan)', value:'scan.jpg'}
     ]
   },
   {
-    key:'ff', name:'Free Fire', poster:'ff.jpg',
-    wa:'6285731569186',
+    key:'ff', name:'Free Fire', poster:'ff.jpg', wa:'6285731569186',
     note:'Harga dapat bervariasi sesuai tier. Estimasi dikonfirmasi admin.',
     prices:[
       {name:'Bronze I – III', sub:'', price:'Rp4.000'},
@@ -869,37 +508,27 @@ const GAMES = [
       {name:'Diamond I – V', sub:'', price:'Rp10.000 – Rp15.000'},
       {name:'Heroic / Master', sub:'per 100 poin', price:'Rp21.000 – Rp22.000'},
       {name:'Grandmaster', sub:'per 100 poin', price:'Rp20.000 – Rp22.000'}
-    ],
-    payment:[
-      {type:'account', label:'SeaBank', value:'901908107090'},
-      {type:'account', label:'ShopeePay', value:'085731569186'},
-      {type:'image', label:'DANA (Scan)', value:'scan.jpg'}
     ]
   },
   {
-    key:'ml', name:'Mobile Legend', poster:'ml.jpg',
-    wa:'6281232446996',
+    key:'ml', name:'Mobile Legend', poster:'ml.jpg', wa:'6281232446996',
     note:'Tidak menerima request hero. Estimasi dikonfirmasi admin.',
     perStar:true,
     prices:[
-      {name:'Warrior',      sub:'per bintang', price:'Rp7.000',  unit:7000},
-      {name:'Elite',        sub:'per bintang', price:'Rp7.000',  unit:7000},
-      {name:'Master',       sub:'per bintang', price:'Rp7.000',  unit:7000},
-      {name:'Grand Master', sub:'per bintang', price:'Rp7.000',  unit:7000},
-      {name:'Epic',         sub:'per bintang', price:'Rp8.000',  unit:8000},
-      {name:'Legend',       sub:'per bintang', price:'Rp15.000', unit:15000},
-      {name:'Mythic',       sub:'per bintang', price:'Rp22.000', unit:22000},
+      {name:'Warrior', sub:'per bintang', price:'Rp7.000', unit:7000},
+      {name:'Elite', sub:'per bintang', price:'Rp7.000', unit:7000},
+      {name:'Master', sub:'per bintang', price:'Rp7.000', unit:7000},
+      {name:'Grand Master', sub:'per bintang', price:'Rp7.000', unit:7000},
+      {name:'Epic', sub:'per bintang', price:'Rp8.000', unit:8000},
+      {name:'Legend', sub:'per bintang', price:'Rp15.000', unit:15000},
+      {name:'Mythic', sub:'per bintang', price:'Rp22.000', unit:22000},
       {name:'Mythic Honor', sub:'per bintang', price:'Rp22.000', unit:22000},
       {name:'Mythic Glory', sub:'per bintang', price:'Rp26.000', unit:26000},
       {name:'Mythic Immortal', sub:'per bintang', price:'Rp34.000', unit:34000}
-    ],
-    payment:[
-      {type:'image', label:'QRIS (Scan)', value:'scan2.jpg'}
     ]
   },
   {
-    key:'hnk', name:'Honkai Star Rail', poster:'hnk.jpg',
-    wa:'62895405065440',
+    key:'hnk', name:'Honkai Star Rail', poster:'hnk.jpg', wa:'62895405065440',
     note:'Menerima Joki Eksplore, Endgame, Jasa Rawat Akun, dan Event. Konfirmasi detail ke admin.',
     prices:[
       {name:'Eksplore - Jarilo', sub:'', price:'Rp84.000'},
@@ -914,14 +543,10 @@ const GAMES = [
       {name:'Jasa Rawat Akun - Mingguan', sub:'per minggu', price:'Rp8.000'},
       {name:'Jasa Rawat Akun - Bulanan', sub:'per bulan', price:'Rp28.000'},
       {name:'Joki Event', sub:'per event', price:'Rp20.000'}
-    ],
-    payment:[
-      {type:'image', label:'DANA (Scan)', value:'scan3.jpg'}
     ]
   },
   {
-    key:'codm', name:'Call Of Duty Mobile', poster:'codm.jpg',
-    wa:'6285895371612',
+    key:'codm', name:'Call Of Duty Mobile', poster:'codm.jpg', wa:'6285895371612',
     note:'Multiplayer Mode. Harga per tier.',
     prices:[
       {name:'Elite per tier', sub:'', price:'Rp12.000'},
@@ -931,9 +556,6 @@ const GAMES = [
       {name:'Master → Legendary', sub:'', price:'Rp750.000'},
       {name:'Elite → Grandmaster', sub:'', price:'Rp1.015.000'},
       {name:'Legendary', sub:'per 100 poin', price:'Rp50.000'}
-    ],
-    payment:[
-      {type:'image', label:'GoPay Merchant (Scan)', value:'scan1.jpg'}
     ]
   }
 ];
@@ -941,37 +563,20 @@ const GAMES = [
 /* =========================================================
    THEME
 ========================================================= */
-const VALID_THEMES = ['red','blue','green','grey','purple','white','black'];
+const VALID_THEMES = ['light','dark'];
 function applyTheme(name){
-  if(!VALID_THEMES.includes(name)) name = 'red';
+  if(!VALID_THEMES.includes(name)) name = 'light';
   document.documentElement.setAttribute('data-theme', name);
   localStorage.setItem('ag_theme', name);
 }
-document.getElementById('themeBtn').addEventListener('click', (e)=>{
-  e.stopPropagation();
-  document.getElementById('themeMenu').classList.toggle('open');
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current === 'light' ? 'dark' : 'light');
 });
-document.querySelectorAll('.theme-item').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    applyTheme(btn.dataset.theme);
-    document.getElementById('themeMenu').classList.remove('open');
-  });
-});
-document.addEventListener('click', ()=> document.getElementById('themeMenu').classList.remove('open'));
-applyTheme(localStorage.getItem('ag_theme') || 'red');
+applyTheme(localStorage.getItem('ag_theme') || 'light');
 
 /* =========================================================
-   LOADER
-========================================================= */
-window.addEventListener('load', ()=>{
-  setTimeout(()=>{
-    document.getElementById('loader').classList.add('hidden');
-    initPosters();
-  }, 3000);
-});
-
-/* =========================================================
-   HERO CAROUSEL
+   PROMO CAROUSEL
 ========================================================= */
 let heroIndex = 0;
 const heroTrack = document.getElementById('heroTrack');
@@ -979,7 +584,7 @@ const heroSlides = heroTrack.children.length;
 const heroDotsWrap = document.getElementById('heroDots');
 for(let i=0;i<heroSlides;i++){
   const d = document.createElement('div');
-  d.className = 'hero-dot' + (i===0?' active':'');
+  d.className = 'promo-dot' + (i===0?' active':'');
   heroDotsWrap.appendChild(d);
 }
 function goHero(i){
@@ -992,80 +597,30 @@ document.getElementById('heroNext').addEventListener('click', ()=>goHero(heroInd
 setInterval(()=>goHero(heroIndex+1), 6000);
 
 /* =========================================================
-   POSTER 3D
+   GAME GRID
 ========================================================= */
-let posterIndex = 0;
-const poster3d = document.getElementById('poster3d');
-function initPosters(){
-  poster3d.innerHTML = '';
-  GAMES.forEach((g, i)=>{
-    const card = document.createElement('div');
-    card.className = 'poster-card';
-    card.dataset.index = i;
-    card.innerHTML = `<img src="${g.poster}" alt="${g.name}" onerror="this.style.background='#1e222b'"/>`;
-    card.addEventListener('click', ()=>{
-      if(i === posterIndex) openDrawer(g);
-      else goPoster(i);
-    });
-    poster3d.appendChild(card);
-  });
-  layoutPosters();
-}
-function layoutPosters(){
-  const cards = [...poster3d.children];
-  const n = cards.length;
-  cards.forEach((card, i)=>{
-    let offset = i - posterIndex;
-    if(offset > Math.floor(n/2)) offset -= n;
-    if(offset < -Math.floor(n/2)) offset += n;
-    const abs = Math.abs(offset);
-    const translateX = offset * 120;
-    const translateZ = abs === 0 ? 0 : -abs * 180;
-    const rotateY = offset * -35;
-    const scale = abs === 0 ? 1 : Math.max(0.55, 1 - abs * 0.16);
-    card.style.transform =
-      `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
-    card.style.zIndex = 100 - abs;
-    card.className = 'poster-card ' + (abs===0?'center': abs===1?'side':'far');
-  });
-}
-function goPoster(i){
-  const n = GAMES.length;
-  posterIndex = (i + n) % n;
-  layoutPosters();
-  closeDrawer();
-}
-document.getElementById('posterPrev').addEventListener('click', ()=>goPoster(posterIndex-1));
-document.getElementById('posterNext').addEventListener('click', ()=>goPoster(posterIndex+1));
-let dragStartX = null;
-const stage = document.querySelector('.poster-stage');
-stage.addEventListener('pointerdown', e=> dragStartX = e.clientX);
-stage.addEventListener('pointerup', e=>{
-  if(dragStartX === null) return;
-  const dx = e.clientX - dragStartX;
-  if(dx > 50) goPoster(posterIndex-1);
-  else if(dx < -50) goPoster(posterIndex+1);
-  dragStartX = null;
+const gameGrid = document.getElementById('gameGrid');
+GAMES.forEach((g, i)=>{
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  card.innerHTML = `
+    <div class="thumb"><img src="${g.poster}" alt="${g.name}" onerror="this.style.background='#e4e8ef'"/></div>
+    <div class="meta">
+      <b>${g.name}</b>
+      <small>${g.prices.length} paket tersedia</small>
+      <span class="badge">JOKI</span>
+    </div>`;
+  card.addEventListener('click', ()=> openDrawer(g));
+  gameGrid.appendChild(card);
 });
 
 /* =========================================================
-   DRAWER
+   DRAWER / PRICE PANEL
 ========================================================= */
-const drawer = document.getElementById('gameDrawer');
+const pricePanelWrap = document.getElementById('pricePanelWrap');
 const drawerTitle = document.getElementById('drawerTitle');
 const priceList = document.getElementById('priceList');
 const drawerNote = document.getElementById('drawerNote');
-const requestCodeBtn = document.getElementById('requestCodeBtn');
-
-function updateRequestCodeBtn(game){
-  if(!game) return;
-  const text = encodeURIComponent(
-    `Halo Admin AGCOMESTORE.DB, saya ingin meminta kode akses untuk melakukan pemesanan.\n\n` +
-    `Game: ${game.name}\n\n` +
-    `Mohon dibantu untuk memberikan kode aksesnya. Terima kasih.`
-  );
-  requestCodeBtn.href = `https://wa.me/${game.wa}?text=${text}`;
-}
 
 function openDrawer(game){
   drawerTitle.textContent = game.name + ' — Pilih Paket';
@@ -1079,19 +634,17 @@ function openDrawer(game){
         <div class="name">${p.name}</div>
         ${p.sub?`<div class="sub">${p.sub}</div>`:''}
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div class="right">
         <div class="price">${p.price}</div>
         <button class="pick">Pesan</button>
       </div>`;
     row.querySelector('.pick').addEventListener('click', ()=> openOrderModal(game, p));
     priceList.appendChild(row);
   });
-
-  updateRequestCodeBtn(game);
-
-  drawer.classList.add('open');
+  pricePanelWrap.style.display = 'block';
+  pricePanelWrap.scrollIntoView({behavior:'smooth', block:'start'});
 }
-function closeDrawer(){ drawer.classList.remove('open'); }
+function closeDrawer(){ pricePanelWrap.style.display = 'none'; }
 document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 
 /* =========================================================
@@ -1099,8 +652,9 @@ document.getElementById('drawerClose').addEventListener('click', closeDrawer);
 ========================================================= */
 const searchInput = document.getElementById('searchInput');
 const searchResult = document.getElementById('searchResult');
+const searchGo = document.getElementById('searchGo');
 let searchTimer = null;
-searchInput.addEventListener('input', ()=>{
+function runSearch(){
   const q = searchInput.value.trim().toLowerCase();
   if(!q){ searchResult.classList.remove('show'); searchResult.innerHTML=''; return; }
   searchResult.innerHTML = `<div class="search-loading"><div class="mini-spin"></div>Mencari game...</div>`;
@@ -1117,29 +671,25 @@ searchInput.addEventListener('input', ()=>{
       const item = document.createElement('div');
       item.className = 'search-item';
       item.innerHTML = `
-        <img src="${g.poster}" alt="${g.name}" onerror="this.style.background='#1e222b'"/>
+        <img src="${g.poster}" alt="${g.name}" onerror="this.style.background='#e4e8ef'"/>
         <div><b>${g.name}</b><small>Klik untuk lihat paket</small></div>`;
       item.addEventListener('click', ()=>{
-        const idx = GAMES.findIndex(x=>x.key===g.key);
-        goPoster(idx);
         openDrawer(g);
         searchResult.classList.remove('show');
         searchInput.value = '';
-        document.querySelector('.game-section').scrollIntoView({behavior:'smooth'});
       });
       searchResult.appendChild(item);
     });
-  }, 2000);
-});
+  }, 1500);
+}
+searchInput.addEventListener('input', runSearch);
+searchGo.addEventListener('click', runSearch);
 
 /* =========================================================
-   ORDER MODAL
+   ORDER MODAL — TANPA KODE, LANGSUNG QR + WA
 ========================================================= */
 const modalMask = document.getElementById('modalMask');
 const modalTitle = document.getElementById('modalTitle');
-const verifyBtn = document.getElementById('verifyBtn');
-const payResult = document.getElementById('payResult');
-const payInfo = document.getElementById('payInfo');
 const waBtn = document.getElementById('waBtn');
 const qtyField = document.getElementById('qtyField');
 const qtyInput = document.getElementById('qtyInput');
@@ -1148,11 +698,11 @@ const qtyPlus = document.getElementById('qtyPlus');
 const unitPriceEl = document.getElementById('unitPrice');
 const totalBox = document.getElementById('totalBox');
 const totalPriceEl = document.getElementById('totalPrice');
+const buyerName = document.getElementById('buyerName');
+const buyerId = document.getElementById('buyerId');
 let currentOrder = null;
 
-function formatRupiah(n){
-  return 'Rp' + n.toLocaleString('id-ID');
-}
+function formatRupiah(n){ return 'Rp' + n.toLocaleString('id-ID'); }
 
 function updateTotal(){
   if(!currentOrder || !currentOrder.pack.unit){ return; }
@@ -1167,12 +717,8 @@ function updateTotal(){
 function openOrderModal(game, pack){
   currentOrder = {game, pack, qty:1, total: pack.unit || null};
   modalTitle.textContent = `Pesan — ${game.name} (${pack.name})`;
-  document.getElementById('buyerName').value = '';
-  document.getElementById('buyerId').value = '';
-  document.getElementById('accessCode').value = '';
-  payResult.classList.remove('show');
-  verifyBtn.disabled = false;
-  verifyBtn.textContent = 'Verifikasi Kode';
+  buyerName.value = '';
+  buyerId.value = '';
 
   if(game.perStar && pack.unit){
     qtyField.style.display = 'block';
@@ -1185,149 +731,78 @@ function openOrderModal(game, pack){
     totalBox.style.display = 'none';
   }
 
+  updateWaButton();
   modalMask.classList.add('open');
 }
 
-qtyMinus.addEventListener('click', ()=>{
-  const v = Math.max(1, parseInt(qtyInput.value || '1', 10) - 1);
-  qtyInput.value = v;
-  updateTotal();
-});
-qtyPlus.addEventListener('click', ()=>{
-  const v = Math.max(1, parseInt(qtyInput.value || '1', 10) + 1);
-  qtyInput.value = v;
-  updateTotal();
-});
-qtyInput.addEventListener('input', ()=>{
-  if(!qtyInput.value) return;
-  updateTotal();
-});
+/* Update tombol WA: aktif hanya jika nama & ID terisi */
+function updateWaButton(){
+  if(!currentOrder) return;
+  const name = buyerName.value.trim();
+  const gid = buyerId.value.trim();
 
-document.getElementById('modalClose').addEventListener('click', ()=>{
-  modalMask.classList.remove('open');
-});
-modalMask.addEventListener('click', e=>{
-  if(e.target === modalMask) modalMask.classList.remove('open');
-});
-
-function isValidCode(code){
-  return /^xqx[a-zA-Z0-9]{4}str$/.test(code);
-}
-function getUsedCodes(){
-  try{ return JSON.parse(localStorage.getItem('ag_used_codes') || '[]'); }catch{ return []; }
-}
-function saveUsedCode(code){
-  const used = getUsedCodes();
-  used.push(code);
-  localStorage.setItem('ag_used_codes', JSON.stringify(used));
-}
-
-verifyBtn.addEventListener('click', ()=>{
-  const name = document.getElementById('buyerName').value.trim();
-  const gid = document.getElementById('buyerId').value.trim();
-  const code = document.getElementById('accessCode').value.trim();
-
-  if(!name || !gid){ alert('Lengkapi nama dan ID game terlebih dahulu.'); return; }
-  if(!isValidCode(code)){ alert('Format kode salah.'); return; }
-
-  const used = getUsedCodes();
-  if(used.includes(code)){ alert('Kode sudah pernah dipakai. Minta kode baru ke admin.'); return; }
-
-  if(currentOrder.game.perStar && currentOrder.pack.unit){
-    const qty = Math.max(1, parseInt(qtyInput.value || '1', 10));
-    if(!qty || qty < 1){ alert('Jumlah bintang minimal 1.'); return; }
-    currentOrder.qty = qty;
-    currentOrder.total = currentOrder.pack.unit * qty;
+  if(!name || !gid){
+    waBtn.classList.add('disabled');
+    waBtn.removeAttribute('href');
+    return;
   }
 
-  verifyBtn.disabled = true;
-  verifyBtn.textContent = 'Memproses...';
+  let detail = `${currentOrder.pack.name} — ${currentOrder.pack.price}`;
+  if(currentOrder.game.perStar && currentOrder.pack.unit){
+    detail = `${currentOrder.pack.name} — ${currentOrder.qty} bintang — Total ${formatRupiah(currentOrder.total)}`;
+  }
 
-  setTimeout(()=>{
-    saveUsedCode(code);
+  const text = encodeURIComponent(
+    `Halo Admin AGCOMESTORE.DB, saya ${name}.\n` +
+    `Game: ${currentOrder.game.name}\n` +
+    `Paket: ${detail}\n` +
+    `ID: ${gid}\n` +
+    `Saya sudah melakukan pembayaran via scan QR (scanqr.jpg). Mohon diproses. Terima kasih.`
+  );
 
-    payInfo.innerHTML = '';
-    currentOrder.game.payment.forEach(p=>{
-      const box = document.createElement('div');
-      box.className = 'pay-box';
-      if(p.type === 'account'){
-        box.innerHTML = `<b>${p.label}</b><div class="num">${p.value}</div>
-          <button class="copy-btn">Salin</button>`;
-        box.querySelector('.copy-btn').addEventListener('click', ()=>{
-          navigator.clipboard.writeText(p.value).then(()=>{
-            box.querySelector('.copy-btn').textContent = 'Tersalin';
-            setTimeout(()=>box.querySelector('.copy-btn').textContent='Salin', 1500);
-          });
-        });
-      } else {
-        box.innerHTML = `<b>${p.label}</b>
-          <img src="${p.value}" alt="${p.label}" onerror="this.style.display='none'"/>`;
-      }
-      payInfo.appendChild(box);
-    });
-
-    const waNumber = currentOrder.game.wa;
-    let detail = `${currentOrder.pack.name} — ${currentOrder.pack.price}`;
-    if(currentOrder.game.perStar && currentOrder.pack.unit){
-      detail = `${currentOrder.pack.name} — ${currentOrder.qty} bintang — Total ${formatRupiah(currentOrder.total)}`;
-    }
-
-    const text = encodeURIComponent(
-      `Halo Admin AGCOMESTORE.DB, saya ${name}.\n` +
-      `Game: ${currentOrder.game.name}\n` +
-      `Paket: ${detail}\n` +
-      `ID: ${gid}\n` +
-      `Kode: ${code}\n` +
-      `Saya sudah melakukan pembayaran. Mohon diproses. Terima kasih.`
-    );
-    waBtn.href = `https://wa.me/${waNumber}?text=${text}`;
-
-    payResult.classList.add('show');
-    verifyBtn.textContent = 'Kode Valid';
-  }, 3000);
-});
-
-/* =========================================================
-   AUDIO
-========================================================= */
-const PLAYLIST = ['Lofi.mp3','DearGod.mp3','Yank.mp3','Thenight.mp3'];
-let audioIndex = 0;
-const bgAudio = document.getElementById('bgAudio');
-bgAudio.volume = 0.55;
-function playAudio(){
-  bgAudio.src = PLAYLIST[audioIndex];
-  bgAudio.play().catch(()=>{});
+  waBtn.href = `https://wa.me/${currentOrder.game.wa}?text=${text}`;
+  waBtn.classList.remove('disabled');
 }
-bgAudio.addEventListener('ended', ()=>{
-  audioIndex = (audioIndex + 1) % PLAYLIST.length;
-  playAudio();
+
+qtyMinus.addEventListener('click', ()=>{
+  qtyInput.value = Math.max(1, parseInt(qtyInput.value || '1', 10) - 1);
+  updateTotal();
+  updateWaButton();
 });
-playAudio();
-['click','touchstart','keydown'].forEach(evt=>{
-  document.addEventListener(evt, function once(){
-    if(bgAudio.paused) playAudio();
-    document.removeEventListener(evt, once);
-  }, {once:true});
+qtyPlus.addEventListener('click', ()=>{
+  qtyInput.value = Math.max(1, parseInt(qtyInput.value || '1', 10) + 1);
+  updateTotal();
+  updateWaButton();
 });
+qtyInput.addEventListener('input', ()=>{
+  if(qtyInput.value){ updateTotal(); updateWaButton(); }
+});
+
+buyerName.addEventListener('input', updateWaButton);
+buyerId.addEventListener('input', updateWaButton);
+
+waBtn.addEventListener('click', (e)=>{
+  if(waBtn.classList.contains('disabled')){
+    e.preventDefault();
+    alert('Lengkapi Nama dan ID Game terlebih dahulu.');
+  }
+});
+
+document.getElementById('modalClose').addEventListener('click', ()=> modalMask.classList.remove('open'));
+modalMask.addEventListener('click', e=>{ if(e.target === modalMask) modalMask.classList.remove('open'); });
 
 /* =========================================================
    JAM OPERASIONAL
-   Buka: 06.00 – 00.00 WIB
-   Istirahat: 13.00 – 13.59 WIB (banner)
-   Tutup: 00.00 – 06.00 WIB (overlay penuh)
 ========================================================= */
 function getWIBDate(){
   const now = new Date();
   return new Date(now.getTime() + (7*60*60*1000) + (now.getTimezoneOffset()*60*1000));
 }
-
 function updateOperationalStatus(){
   const wib = getWIBDate();
   const h = wib.getHours();
-
   const isClosed = (h >= 0 && h < 6);
   const isBreak = (h === 13);
-
   const overlay = document.getElementById('closedOverlay');
   const banner = document.getElementById('breakBanner');
   const countdownEl = document.getElementById('closedCountdown');
@@ -1335,7 +810,6 @@ function updateOperationalStatus(){
   if(isClosed){
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
-
     const target = new Date(wib);
     target.setHours(6,0,0,0);
     if(target <= wib) target.setDate(target.getDate()+1);
@@ -1348,14 +822,8 @@ function updateOperationalStatus(){
     overlay.classList.remove('show');
     document.body.style.overflow = '';
   }
-
-  if(isBreak){
-    banner.classList.add('show');
-  } else {
-    banner.classList.remove('show');
-  }
+  banner.classList.toggle('show', isBreak);
 }
-
 updateOperationalStatus();
 setInterval(updateOperationalStatus, 1000);
 </script>
